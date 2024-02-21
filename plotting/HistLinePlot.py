@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: lshuns
 # @Date:   2022-04-21 14:16:38
-# @Last Modified by:   lshuns
-# @Last Modified time: 2022-09-01 11:28:10
+# @Last Modified by:   Your name
+# @Last Modified time: 2024-02-21 18:57:03
 
 ### everything about histogram + line plots
 
@@ -62,7 +62,7 @@ def HistErrorPlotFunc(outpath,
         backend_orig = plt.get_backend()
         plt.switch_backend("agg")
 
-    if DENSITY and (wgs is not None):
+    if DENSITY and (wgs_hist is not None):
         logger.warning('DENSITY and wgs are provided simultaneously!!!')
 
     # definitions for the axes
@@ -215,8 +215,6 @@ def HistErrorPlotFunc(outpath,
     ax.set_xlabel(XLABEL)
     if TITLE is not None:
         plt.title(TITLE)
-
-    plt.tight_layout()
 
     if outpath == 'show':
         plt.show()
