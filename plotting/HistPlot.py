@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2021-05-05, 8:21:22
+# @Last modified time: 2024-05-06 18:06:58
 
 ### everything about histogram
 
@@ -13,12 +13,12 @@ import logging
 import numpy as np
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
 mpl.rcParams['xtick.top'] = True
 mpl.rcParams['ytick.right'] = True
-
-import matplotlib.pyplot as plt
+plt.rcParams['font.family'] = 'serif'
 
 from matplotlib.ticker import AutoMinorLocator, LogLocator
 from matplotlib.patches import Rectangle
