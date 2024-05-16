@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-05, 21:44:40
 # @Last modified by:   lshuns
-# @Last modified time: 2024-05-06 18:06:43
+# @Last modified time: 2024-05-16 17:00:45
 
 ### everything about Line/Point plot
 
@@ -362,13 +362,16 @@ def ErrorPlotFunc(outpath,
                 xerrs=None, 
                 alpha_list = None, zorder_list = None,
                 FIGSIZE=[6.4, 4.8],
-                transparent=False):
+                transparent=False,
+                font_size_label=None):
     """
     Errorbar plot for multiple parameters
     """
 
     # font size
     plt.rc('font', size=font_size)
+    if font_size_label is None:
+        font_size_label = font_size
     # tex
     plt.rcParams["text.usetex"] = usetex
 
@@ -463,7 +466,7 @@ def ErrorPlotFunc(outpath,
         _vhlines('h', hlines, line_styles=hline_styles, line_colors=hline_colors, line_labels=hline_labels, line_widths=hline_widths)
 
     if LABELs is not None:
-        plt.legend(frameon=legend_frame, loc=loc_legend)
+        plt.legend(frameon=legend_frame, loc=loc_legend, fontsize=font_size_label)
 
     if xtick_min_label:
         if xlog:
