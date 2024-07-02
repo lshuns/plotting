@@ -1,12 +1,12 @@
 # @Author: lshuns
 # @Date:   2021-04-05, 21:44:40
 # @Last modified by:   lshuns
-# @Last modified time: 2024-05-16 17:00:45
+# @Last modified time: 2024-06-12 09:54:41
 
 ### everything about Line/Point plot
 
 __all__ = ["LinePlotFunc", "LinePlotFunc_subplots", "ErrorPlotFunc", "ErrorPlotFunc_subplots",
-            "ScatterPlotFunc"]
+            "ScatterPlotFunc", "ErrorPlotFunc_2sub_shareX"]
 
 import math
 import logging
@@ -354,7 +354,7 @@ def ErrorPlotFunc(outpath,
                 vlines=None, vline_styles=None, vline_colors=None, vline_labels=None, vline_widths=None,
                 hlines=None, hline_styles=None, hline_colors=None, hline_labels=None, hline_widths=None,
                 xlog=False, invertX=False, ylog=False, invertY=False, 
-                loc_legend='best', legend_frame=False,
+                loc_legend='best', legend_frame=False, frame_alpha=0.8,
                 fill_between_xs=None, 
                 fill_between_yLows=None, fill_between_yHighs=None,
                 fill_between_COLORs=None, fill_between_alphas=None,
@@ -466,7 +466,7 @@ def ErrorPlotFunc(outpath,
         _vhlines('h', hlines, line_styles=hline_styles, line_colors=hline_colors, line_labels=hline_labels, line_widths=hline_widths)
 
     if LABELs is not None:
-        plt.legend(frameon=legend_frame, loc=loc_legend, fontsize=font_size_label)
+        plt.legend(frameon=legend_frame, framealpha=frame_alpha, loc=loc_legend, fontsize=font_size_label)
 
     if xtick_min_label:
         if xlog:
@@ -880,3 +880,295 @@ def ScatterPlotFunc(outpath,
         plt.close()
         plt.switch_backend(backend_orig)
         print("Scatter plot saved as", outpath)
+
+def ErrorPlotFunc_2sub_shareX(outpath,
+                xvals_u, yvals_u, yerrs_u,
+                xvals_d, yvals_d, yerrs_d,
+                COLORs_u, COLORs_d,
+                LABELs_u=None, LINEs_u=None, LINEWs_u=None, POINTs_u=None, POINTSs_u=None, ERRORSIZEs_u=None,
+                LABELs_d=None, LINEs_d=None, LINEWs_d=None, POINTs_d=None, POINTSs_d=None, ERRORSIZEs_d=None,
+                XRANGE=None, YRANGE_u=None, YRANGE_d=None,
+                XLABEL=None, YLABEL_u=None, YLABEL_d=None, TITLE=None,
+                xtick_min_label=True, xtick_spe=None, 
+                ytick_min_label_u=True, ytick_spe_u=None,
+                ytick_min_label_d=True, ytick_spe_d=None,
+                vlines=None, vline_styles=None, vline_colors=None, vline_labels=None, vline_widths=None,
+                hlines_u=None, hline_styles_u=None, hline_colors_u=None, hline_labels_u=None, hline_widths_u=None,
+                hlines_d=None, hline_styles_d=None, hline_colors_d=None, hline_labels_d=None, hline_widths_d=None,
+                xlog=False, invertX=False, 
+                ylog_u=False, invertY_u=False, ylog_d=False, invertY_d=False, 
+                loc_legend_u='best', legend_frame_u=False, frame_alpha_u=0.8,
+                loc_legend_d='best', legend_frame_d=False, frame_alpha_d=0.8,
+                fill_between_xs_u=None, 
+                fill_between_yLows_u=None, fill_between_yHighs_u=None,
+                fill_between_COLORs_u=None, fill_between_alphas_u=None,
+                fill_between_xs_d=None, 
+                fill_between_yLows_d=None, fill_between_yHighs_d=None,
+                fill_between_COLORs_d=None, fill_between_alphas_d=None,
+                font_size=12, usetex=False,
+                xerrs_u=None, xerrs_d=None, 
+                alpha_list_u = None, zorder_list_u = None,
+                alpha_list_d = None, zorder_list_d = None,
+                FIGSIZE=[6.4, 4.8],
+                transparent=False,
+                font_size_label=None):
+    """
+    Errorbar plot for multiple parameters
+    """
+
+    # font size
+    plt.rc('font', size=font_size)
+    if font_size_label is None:
+        font_size_label = font_size
+    # tex
+    plt.rcParams["text.usetex"] = usetex
+
+    if outpath != 'show':
+        backend_orig = plt.get_backend()
+        plt.switch_backend("agg")
+
+    # two subplots with ratio: 3:1
+    fig, axs = plt.subplots(2, 1, figsize=FIGSIZE, gridspec_kw={'height_ratios': [3, 1]})
+
+    # the upper plot
+    for i, xvl in enumerate(xvals_u):
+        yvl = yvals_u[i]
+        if yerrs_u is not None:
+            yerr = yerrs_u[i]
+            if yerr is not None:
+                yerr = np.array(yerr)
+                yerr = np.vstack([yerr[0], yerr[1]])
+        else:
+            yerr = None
+
+        if xerrs_u is not None:
+            xerr = xerrs_u[i]
+            if xerr is not None:
+                xerr = np.array(xerr)
+                xerr = np.vstack([xerr[0], xerr[1]])
+        else:
+            xerr = None
+
+        CR = COLORs_u[i]
+
+        if alpha_list_u is not None:
+            alpha = alpha_list_u[i]
+        else:
+            alpha = None
+        if zorder_list_u is not None:
+            zorder = zorder_list_u[i]
+        else:
+            zorder = i + 1
+
+        if LABELs_u is not None:
+            LAB = LABELs_u[i]
+        else:
+            LAB = None
+
+        if LINEs_u is not None:
+            LN = LINEs_u[i]
+        else:
+            LN = '--'
+        if LINEWs_u is not None:
+            LW = LINEWs_u[i]
+        else:
+            LW = 1
+
+        if POINTs_u is not None:
+            PI = POINTs_u[i]
+        else:
+            PI = 'o'
+        if POINTSs_u is not None:
+            MS = POINTSs_u[i]
+        else:
+            MS = 2
+
+        if ERRORSIZEs_u is not None:
+            ERRORSIZE = ERRORSIZEs_u[i]
+        else:
+            ERRORSIZE = 2
+
+        axs[0].errorbar(xvl, yvl, xerr=xerr, yerr=yerr, 
+            color=CR, label=LAB, linestyle=LN, linewidth=LW, marker=PI, markersize=MS, capsize=ERRORSIZE,
+            alpha=alpha,
+            zorder=zorder)
+
+    if fill_between_xs_u is not None:
+        for i_fill, fill_between_x in enumerate(fill_between_xs_u):
+            axs[0].fill_between(fill_between_x, 
+                        fill_between_yLows_u[i_fill], fill_between_yHighs_u[i_fill],
+                        alpha=fill_between_alphas_u[i_fill],
+                        color=fill_between_COLORs_u[i_fill])
+
+    if YRANGE_u is not None:
+        axs[0].set_ylim(YRANGE_u[0], YRANGE_u[1])
+
+    if ylog_u:
+        axs[0].set_yscale('log')
+
+    if vlines is not None:
+        _vhlines('v', vlines, 
+                line_styles=vline_styles, line_colors=vline_colors, line_labels=vline_labels, line_widths=vline_widths,
+                ax=axs[0])
+
+    if hlines_u is not None:
+        _vhlines('h', hlines_u, 
+                line_styles=hline_styles_u, line_colors=hline_colors_u, line_labels=hline_labels_u, line_widths=hline_widths_u,
+                ax=axs[0])
+
+    if LABELs_u is not None:
+        axs[0].legend(frameon=legend_frame_u, framealpha=frame_alpha_u,
+                      loc=loc_legend_u, fontsize=font_size_label)
+
+    if ytick_min_label_u:
+        if ylog_u:
+            axs[0].yaxis.set_minor_locator(LogLocator(base=10.0, subs=None, numticks=10))
+        else:
+            axs[0].yaxis.set_minor_locator(AutoMinorLocator())
+
+    if ytick_spe_u is not None:
+        axs[0].set_yticks(ytick_spe_u[0], ytick_spe_u[1])
+
+    if invertY_u:
+        axs[0].invert_yaxis()
+
+    axs[0].set_ylabel(YLABEL_u)
+    if TITLE is not None:
+        axs[0].set_title(TITLE)
+
+    # the lower plot
+    for i, xvl in enumerate(xvals_d):
+        yvl = yvals_d[i]
+        if yerrs_d is not None:
+            yerr = yerrs_d[i]
+            if yerr is not None:
+                yerr = np.array(yerr)
+                yerr = np.vstack([yerr[0], yerr[1]])
+        else:
+            yerr = None
+
+        if xerrs_d is not None:
+            xerr = xerrs_d[i]
+            if xerr is not None:
+                xerr = np.array(xerr)
+                xerr = np.vstack([xerr[0], xerr[1]])
+        else:
+            xerr = None
+
+        CR = COLORs_d[i]
+
+        if alpha_list_d is not None:
+            alpha = alpha_list_d[i]
+        else:
+            alpha = None
+        if zorder_list_d is not None:
+            zorder = zorder_list_d[i]
+        else:
+            zorder = i + 1
+
+        if LABELs_d is not None:
+            LAB = LABELs_d[i]
+        else:
+            LAB = None
+
+        if LINEs_d is not None:
+            LN = LINEs_d[i]
+        else:
+            LN = '--'
+        if LINEWs_d is not None:
+            LW = LINEWs_d[i]
+        else:
+            LW = 1
+
+        if POINTs_d is not None:
+            PI = POINTs_d[i]
+        else:
+            PI = 'o'
+        if POINTSs_d is not None:
+            MS = POINTSs_d[i]
+        else:
+            MS = 2
+
+        if ERRORSIZEs_d is not None:
+            ERRORSIZE = ERRORSIZEs_d[i]
+        else:
+            ERRORSIZE = 2
+
+        axs[1].errorbar(xvl, yvl, xerr=xerr, yerr=yerr, 
+            color=CR, label=LAB, linestyle=LN, linewidth=LW, marker=PI, markersize=MS, capsize=ERRORSIZE,
+            alpha=alpha,
+            zorder=zorder)
+
+    if fill_between_xs_d is not None:
+        for i_fill, fill_between_x in enumerate(fill_between_xs_d):
+            axs[1].fill_between(fill_between_x, 
+                        fill_between_yLows_d[i_fill], fill_between_yHighs_d[i_fill],
+                        alpha=fill_between_alphas_d[i_fill],
+                        color=fill_between_COLORs_d[i_fill])
+
+    if YRANGE_d is not None:
+        axs[1].set_ylim(YRANGE_d[0], YRANGE_d[1])
+
+    if ylog_d:
+        axs[1].set_yscale('log')
+
+    if vlines is not None:
+        _vhlines('v', vlines, 
+                 line_styles=vline_styles, line_colors=vline_colors, line_labels=vline_labels, line_widths=vline_widths,
+                 ax=axs[1])
+
+    if hlines_d is not None:
+        _vhlines('h', hlines_d, 
+                line_styles=hline_styles_d, line_colors=hline_colors_d, line_labels=hline_labels_d, line_widths=hline_widths_d,
+                ax=axs[1])
+
+    if LABELs_d is not None:
+        axs[1].legend(frameon=legend_frame_d, framealpha=frame_alpha_d,
+                      loc=loc_legend_d, fontsize=font_size_label)
+
+    if ytick_min_label_d:
+        if ylog_d:
+            axs[1].yaxis.set_minor_locator(LogLocator(base=10.0, subs=None, numticks=10))
+        else:
+            axs[1].yaxis.set_minor_locator(AutoMinorLocator())
+
+    if ytick_spe_d is not None:
+        axs[1].set_yticks(ytick_spe_d[0], ytick_spe_d[1])
+
+    if invertY_d:
+        axs[1].invert_yaxis()
+
+    axs[1].set_ylabel(YLABEL_d)
+
+    # share the x
+    axs[0].get_shared_x_axes().join(axs[0], axs[1])
+    # Hide top x-tick labels 
+    axs[0].tick_params(labelbottom=False)
+    # x axis info
+    if XRANGE is not None:
+        plt.xlim(XRANGE[0], XRANGE[1])
+    if xlog:
+        plt.xscale('log')
+    if xtick_min_label:
+        if xlog:
+            axs[0].xaxis.set_minor_locator(LogLocator(base=10.0, subs=None, numticks=10))
+        else:
+            axs[0].xaxis.set_minor_locator(AutoMinorLocator())
+    if xtick_spe is not None:
+        plt.xticks(xtick_spe[0], xtick_spe[1])
+    if invertX:
+        plt.gca().invert_xaxis()
+
+    axs[1].set_xlabel(XLABEL)
+
+    plt.tight_layout()
+
+    if outpath=='show':
+        plt.show()
+        plt.close()
+    else:
+        plt.savefig(outpath, dpi=300, transparent=transparent)
+        plt.close()
+        plt.switch_backend(backend_orig)
+        print("Errorbar plot saved in", outpath)
+

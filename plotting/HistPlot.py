@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2024-05-06 18:06:58
+# @Last modified time: 2024-06-14 11:04:17
 
 ### everything about histogram
 
@@ -39,6 +39,7 @@ def HistPlotFunc(outpath,
                 hlines=None, hline_styles=None, hline_colors=None, hline_labels=None, hline_widths=None,
                 xlog=False, ylog=False,
                 loc_legend='best', 
+                LABEL_position='inSub', LABEL_cols=1,
                 font_size=12, usetex=False,
                 cumulative=False, 
                 FIGSIZE=[6.4, 4.8],
@@ -74,12 +75,12 @@ def HistPlotFunc(outpath,
                     wg = wgs[i_para]
                 else:
                     wg = None
-                plt.hist(x=para, bins=logbins, cumulative=cumulative,
+                _, _, handles = plt.hist(x=para, bins=logbins, cumulative=cumulative,
                             density=DENSITY, weights=wg, 
                             color=COLORs[i_para], label=LABELs[i_para], histtype=HISTTYPE, stacked=STACKED,
                             ls=LINEs[i_para], lw=LW, alpha=alpha)
         else:
-            plt.hist(x=paras, bins=logbins, cumulative=cumulative,
+            _, _, handles = plt.hist(x=paras, bins=logbins, cumulative=cumulative,
                         density=DENSITY, weights=wgs, 
                         color=COLORs, label=LABELs, histtype=HISTTYPE, stacked=STACKED, alpha=alpha)
     else:
@@ -93,12 +94,12 @@ def HistPlotFunc(outpath,
                     wg = wgs[i_para]
                 else:
                     wg = None
-                plt.hist(x=para, bins=nbins, cumulative=cumulative,
+                _, _, handles = plt.hist(x=para, bins=nbins, cumulative=cumulative,
                             range=XRANGE, density=DENSITY, weights=wg, 
                             color=COLORs[i_para], label=LABELs[i_para], histtype=HISTTYPE, stacked=STACKED,
                             ls=LINEs[i_para], lw=LW, alpha=alpha)
         else:
-            plt.hist(x=paras, bins=nbins, cumulative=cumulative, 
+            _, _, handles = plt.hist(x=paras, bins=nbins, cumulative=cumulative, 
                         range=XRANGE, density=DENSITY, 
                         weights=wgs, color=COLORs, label=LABELs, histtype=HISTTYPE, stacked=STACKED, alpha=alpha)
 
@@ -133,8 +134,16 @@ def HistPlotFunc(outpath,
     if ytick_spe is not None:
         plt.yticks(ytick_spe[0], ytick_spe[1])
 
-    if LABELs is not None:
+    if (LABEL_position=='inSub') and (LABELs is not None):
         plt.legend(frameon=False, loc=loc_legend)
+    elif (LABEL_position=='top') and (LABELs is not None):
+        legend_handles = []
+        for sublist in handles:
+            legend_handles.append(sublist[0])
+        fig.legend(legend_handles, LABELs, 
+                loc = 'center', ncol=LABEL_cols,
+                bbox_to_anchor=(0.5, 0.95), fancybox=True, shadow=True)
+
     plt.xlabel(XLABEL)
     plt.ylabel(YLABEL)
     if TITLE is not None:
