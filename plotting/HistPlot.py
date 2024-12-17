@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2024-07-25 11:28:47
+# @Last modified time: 2024-12-17 14:48:26
 
 ### everything about histogram
 
@@ -45,7 +45,8 @@ def HistPlotFunc(outpath,
                 FIGSIZE=[6.4, 4.8],
                 LINEs=None, LINEWs=None,
                 TIGHT=False,
-                alpha=None):
+                alpha=None,
+                HISTTYPE_list=None):
     """
     Histogram plot for multiple parameters
     """
@@ -62,46 +63,45 @@ def HistPlotFunc(outpath,
     if DENSITY and (wgs is not None):
         logger.warning('DENSITY and wgs are provided simultaneously!!!')
 
-    fig, ax = plt.subplots(figsize=FIGSIZE)
+    if XRANGE is None:
+        raise Exception('XRANGE cannot be None!')
+
     if xlog:
-        logbins = np.logspace(np.log10(XRANGE[0]), np.log10(XRANGE[1]), nbins)
-        if LINEs is not None:
-            for i_para, para in enumerate(paras):
-                if LINEWs is not None:
-                    LW = LINEWs[i_para]
-                else:
-                    LW = None
-                if wgs is not None:
-                    wg = wgs[i_para]
-                else:
-                    wg = None
-                _, _, handles = plt.hist(x=para, bins=logbins, cumulative=cumulative,
-                            density=DENSITY, weights=wg, 
-                            color=COLORs[i_para], label=LABELs[i_para], histtype=HISTTYPE, stacked=STACKED,
-                            ls=LINEs[i_para], lw=LW, alpha=alpha)
-        else:
-            _, _, handles = plt.hist(x=paras, bins=logbins, cumulative=cumulative,
-                        density=DENSITY, weights=wgs, 
-                        color=COLORs, label=LABELs, histtype=HISTTYPE, stacked=STACKED, alpha=alpha)
+        bins = np.logspace(np.log10(XRANGE[0]), np.log10(XRANGE[1]), nbins)
     else:
+        bins = np.linspace(XRANGE[0], XRANGE[1], nbins)
+
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+
+    for i_para, para in enumerate(paras):
         if LINEs is not None:
-            for i_para, para in enumerate(paras):
-                if LINEWs is not None:
-                    LW = LINEWs[i_para]
-                else:
-                    LW = None
-                if wgs is not None:
-                    wg = wgs[i_para]
-                else:
-                    wg = None
-                _, _, handles = plt.hist(x=para, bins=nbins, cumulative=cumulative,
-                            range=XRANGE, density=DENSITY, weights=wg, 
-                            color=COLORs[i_para], label=LABELs[i_para], histtype=HISTTYPE, stacked=STACKED,
-                            ls=LINEs[i_para], lw=LW, alpha=alpha)
+            LINE = LINEs[i_para]
         else:
-            _, _, handles = plt.hist(x=paras, bins=nbins, cumulative=cumulative, 
-                        range=XRANGE, density=DENSITY, 
-                        weights=wgs, color=COLORs, label=LABELs, histtype=HISTTYPE, stacked=STACKED, alpha=alpha)
+            LINE = None
+
+        if LINEWs is not None:
+            LW = LINEWs[i_para]
+        else:
+            LW = None
+
+        if wgs is not None:
+            wg = wgs[i_para]
+        else:
+            wg = None
+
+        if LABELs is not None:
+            LABEL = LABELs[i_para]
+        else:
+            LABEL = None
+
+        if HISTTYPE_list is not None:
+            HISTTYPE = HISTTYPE_list[i_para]
+
+        _, _, handles = plt.hist(x=para, bins=bins, cumulative=cumulative,
+                    range=XRANGE, density=DENSITY, weights=wg, 
+                    color=COLORs[i_para], label=LABEL, 
+                    histtype=HISTTYPE, stacked=STACKED,
+                    ls=LINE, lw=LW, alpha=alpha)
 
     plt.xlim(XRANGE[0], XRANGE[1])
     if YRANGE is not None:
@@ -265,7 +265,11 @@ def HistPlotFunc_subplots(outpath, N_plots,
                             LABEL_cols=1, 
                             FIGSIZE=[6.4, 4.8],
                             TIGHT=False,
-                            HISTTYPEs_list=None):
+                            HISTTYPEs_list=None,
+                            shareX=True,
+                            shareY=True,
+                            XRANGE_list=None,
+                            YRANGE_list=None):
     """
     Histogram plot for multiple subplots
     """
@@ -281,9 +285,10 @@ def HistPlotFunc_subplots(outpath, N_plots,
 
     N_rows = math.ceil(N_plots**0.5)
     N_cols = math.ceil(N_plots/N_rows)
-    fig, axs = plt.subplots(N_rows, N_cols, sharex=True, sharey=True, figsize=FIGSIZE)
-    fig.subplots_adjust(hspace=0)
-    fig.subplots_adjust(wspace=0)
+    fig, axs = plt.subplots(N_rows, N_cols, sharex=shareX, sharey=shareY, figsize=FIGSIZE)
+    if shareX and shareY:
+        fig.subplots_adjust(hspace=0)
+        fig.subplots_adjust(wspace=0)
 
     if DENSITY and (wgs_list is not None):
         logger.warning('DENSITY and wgs are provided simultaneously!!!')
@@ -315,6 +320,12 @@ def HistPlotFunc_subplots(outpath, N_plots,
                 else:
                     LABELs = None
 
+                if XRANGE_list is not None:
+                    XRANGE = XRANGE_list[i_plot]
+
+                if YRANGE_list is not None:
+                    YRANGE = YRANGE_list[i_plot]
+
                 if HISTTYPEs_list is not None:
                     HISTTYPEs = HISTTYPEs_list[i_plot]
                 else:
@@ -328,7 +339,7 @@ def HistPlotFunc_subplots(outpath, N_plots,
                 if LINEWs_list is not None:
                     LINEWs = LINEWs_list[i_plot]
                 else:
-                    LINEWs = [1] * len(paras)
+                    LINEWs = None
 
                 nbins = nbins_list[i_plot]
                 if wgs_list is not None:
@@ -379,83 +390,41 @@ def HistPlotFunc_subplots(outpath, N_plots,
                     hline_widths = None
 
                 if xlog:
-                    logbins = np.logspace(np.log10(XRANGE[0]), np.log10(XRANGE[1]), nbins)
-                    if LINEs is not None:
-                        for i_val_tmp, para_tmp in enumerate(paras):
-                            if LABELs is not None:
-                                LABEL = LABELs[i_val_tmp]
-                            else:
-                                LABEL = None
-                            if wgs is not None:
-                                wg = wgs[i_val_tmp]
-                            else:
-                                wg = None
-                            ax.hist(x=para_tmp, 
-                                bins=logbins, density=DENSITY, 
-                                weights=wg, color=COLORs[i_val_tmp], 
-                                label=LABEL, histtype=HISTTYPE, 
-                                stacked=STACKED,
-                                ls=LINEs[i_val_tmp], lw=LINEWs[i_val_tmp])
-                    elif HISTTYPEs is not None:
-                        for i_val_tmp, para_tmp in enumerate(paras):
-                            if LABELs is not None:
-                                LABEL = LABELs[i_val_tmp]
-                            else:
-                                LABEL = None
-                            if wgs is not None:
-                                wg = wgs[i_val_tmp]
-                            else:
-                                wg = None
-                            ax.hist(x=para_tmp, 
-                                bins=logbins, density=DENSITY, 
-                                weights=wg, color=COLORs[i_val_tmp], 
-                                label=LABEL, histtype=HISTTYPEs[i_val_tmp], 
-                                stacked=STACKED)
-                    else:
-                        ax.hist(x=paras, 
-                                bins=logbins, density=DENSITY, 
-                                weights=wgs, color=COLORs, 
-                                label=LABELs, histtype=HISTTYPE, 
-                                stacked=STACKED)
-
+                    bins = np.logspace(np.log10(XRANGE[0]), np.log10(XRANGE[1]), nbins)
                 else:
+                    bins = np.linspace(XRANGE[0], XRANGE[1], nbins)
+
+                for i_val_tmp, para_tmp in enumerate(paras):
+
                     if LINEs is not None:
-                        for i_val_tmp, para_tmp in enumerate(paras):
-                            if LABELs is not None:
-                                LABEL = LABELs[i_val_tmp]
-                            else:
-                                LABEL = None
-                            if wgs is not None:
-                                wg = wgs[i_val_tmp]
-                            else:
-                                wg = None
-                            ax.hist(x=para_tmp, 
-                                bins=nbins, range=XRANGE, density=DENSITY, 
-                                weights=wg, color=COLORs[i_val_tmp], 
-                                label=LABEL, histtype=HISTTYPE, 
-                                stacked=STACKED,
-                                ls=LINEs[i_val_tmp], lw=LINEWs[i_val_tmp])
-                    elif HISTTYPEs is not None:
-                        for i_val_tmp, para_tmp in enumerate(paras):
-                            if LABELs is not None:
-                                LABEL = LABELs[i_val_tmp]
-                            else:
-                                LABEL = None
-                            if wgs is not None:
-                                wg = wgs[i_val_tmp]
-                            else:
-                                wg = None
-                            ax.hist(x=para_tmp, 
-                                bins=nbins, range=XRANGE, density=DENSITY, 
-                                weights=wg, color=COLORs[i_val_tmp], 
-                                label=LABEL, histtype=HISTTYPEs[i_val_tmp], 
-                                stacked=STACKED)
+                        LINE = LINEs[i_val_tmp]
                     else:
-                        ax.hist(x=paras, 
-                                bins=nbins, range=XRANGE, 
-                                density=DENSITY, weights=wgs, 
-                                color=COLORs, label=LABELs, 
-                                histtype=HISTTYPE, stacked=STACKED)
+                        LINE = None
+
+                    if LINEWs is not None:
+                        LW = LINEWs[i_val_tmp]
+                    else:
+                        LW = None
+
+                    if wgs is not None:
+                        wg = wgs[i_val_tmp]
+                    else:
+                        wg = None
+
+                    if LABELs is not None:
+                        LABEL = LABELs[i_val_tmp]
+                    else:
+                        LABEL = None
+
+                    if HISTTYPEs is not None:
+                        HISTTYPE = HISTTYPEs[i_val_tmp]
+
+                    ax.hist(x=para_tmp, 
+                        bins=bins, range=XRANGE, density=DENSITY, 
+                        weights=wg, color=COLORs[i_val_tmp], 
+                        label=LABEL, histtype=HISTTYPE, 
+                        stacked=STACKED,
+                        ls=LINE, lw=LW)
 
                 if (LABEL_position=='inSub') and (i_plot == LABEL_position_SUBid) and (LABELs is not None):
                     ax.legend(frameon=True, loc=loc_legend)
