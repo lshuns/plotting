@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-05, 21:44:40
 # @Last modified by:   lshuns
-# @Last modified time: 2024-06-12 09:54:41
+# @Last modified time: 2024-12-20 18:16:30
 
 ### everything about Line/Point plot
 
@@ -317,8 +317,8 @@ def LinePlotFunc_subplots(outpath, N_plots,
 
             i_plot +=1
 
-    fig.text(0.5, 0.03, XLABEL, ha='center')
-    fig.text(0.04, 0.5, YLABEL, va='center', rotation='vertical')
+    fig.text(0.5, 0.01, XLABEL, ha='center', va='bottom')
+    fig.text(0.01, 0.5, YLABEL, ha='left', va='center', rotation='vertical')
 
     if TITLE is not None:
         fig.text(0.5, 0.90, TITLE, ha='center')
@@ -753,15 +753,11 @@ def ErrorPlotFunc_subplots(outpath, N_plots,
 
             i_plot +=1
 
-    if TIGHT:
-        fig.text(0.5, 0.01, XLABEL, ha='center')
-        fig.text(0.01, 0.5, YLABEL, va='center', rotation='vertical')
-    else:
-        fig.text(0.5, 0.01, XLABEL, ha='center')
-        fig.text(0.01, 0.5, YLABEL, va='center', rotation='vertical')
+    fig.text(0.5, 0.01, XLABEL, ha='center', va='bottom')
+    fig.text(0.01, 0.5, YLABEL, ha='left', va='center', rotation='vertical')
 
-        if TITLE is not None:
-            fig.text(0.5, 0.90, TITLE, ha='center')
+    if TITLE is not None:
+        fig.text(0.5, 0.90, TITLE, ha='center')
 
     if (LABEL_position=='right') and (LABELs is not None):
         fig.legend(handles, LABELs, 

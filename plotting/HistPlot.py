@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2024-12-17 14:48:26
+# @Last modified time: 2024-12-20 18:15:24
 
 ### everything about histogram
 
@@ -466,8 +466,8 @@ def HistPlotFunc_subplots(outpath, N_plots,
 
             i_plot +=1
 
-    fig.text(0.5, 0.04, XLABEL, ha='center')
-    fig.text(0.04, 0.5, YLABEL, va='center', rotation='vertical')
+    fig.text(0.5, 0.01, XLABEL, ha='center', va='bottom')
+    fig.text(0.01, 0.5, YLABEL, ha='left', va='center', rotation='vertical')
 
     if (LABEL_position=='right') and (LABELs is not None):
         handles = [Rectangle((0,0),1,1,color='white', ec=c) for c in COLORs]
@@ -598,9 +598,8 @@ def Hist2DPlotFunc_subplots(outpath, N_plots,
 
             i_plot +=1
 
-
-    fig.text(0.5, 0.04, XLABEL, ha='center')
-    fig.text(0.04, 0.5, YLABEL, va='center', rotation='vertical')
+    fig.text(0.5, 0.01, XLABEL, ha='center', va='bottom')
+    fig.text(0.01, 0.5, YLABEL, ha='left', va='center', rotation='vertical')
 
     if TITLE is not None:
         fig.text(0.5, 0.90, TITLE, ha='center')
