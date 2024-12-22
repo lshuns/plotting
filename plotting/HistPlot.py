@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2024-12-20 18:15:24
+# @Last modified time: 2024-12-22 11:02:10
 
 ### everything about histogram
 
@@ -174,7 +174,8 @@ def Hist2DPlotFunc(outpath,
                 hlines=None, hline_styles=None, hline_colors=None, hline_labels=None, hline_widths=None,
                 font_size=12, usetex=False, 
                 FIGSIZE=[6.4, 4.8],
-                TIGHT=False):
+                TIGHT=False,
+                xlog=False, ylog=False):
     """
     2D histogram plot
     """
@@ -203,6 +204,11 @@ def Hist2DPlotFunc(outpath,
         norm = mpl.colors.Normalize(vmin=count_scale[0], vmax=count_scale[1])
     h = plt.hist2d(x_val, y_val, bins=nbins, range=SRANGE, density=DENSITY, weights=wg, norm=norm, cmap=COLOR_MAP)
     cbar = plt.colorbar(h[3])
+
+    if xlog:
+        ax.set_xscale('log')
+    if ylog:
+        ax.set_yscale('log')
 
     if CBAR_LABEL is not None:
         cbar.ax.set_ylabel(CBAR_LABEL, rotation=270)
