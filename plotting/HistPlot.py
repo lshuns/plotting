@@ -1,7 +1,7 @@
 # @Author: lshuns
 # @Date:   2021-04-01, 21:04:38
 # @Last modified by:   lshuns
-# @Last modified time: 2024-12-22 11:02:10
+# @Last modified time: 2025-05-21 11:30:08
 
 ### everything about histogram
 
@@ -74,34 +74,25 @@ def HistPlotFunc(outpath,
     fig, ax = plt.subplots(figsize=FIGSIZE)
 
     for i_para, para in enumerate(paras):
-        if LINEs is not None:
-            LINE = LINEs[i_para]
-        else:
-            LINE = None
+        LINE = LINEs[i_para] if LINEs is not None else None
+        LW = LINEWs[i_para] if LINEWs is not None else None
+        wg = wgs[i_para] if wgs is not None else None
+        LABEL = LABELs[i_para] if LABELs is not None else None
+        HISTTYPE = HISTTYPE_list[i_para] if HISTTYPE_list is not None else HISTTYPE
 
-        if LINEWs is not None:
-            LW = LINEWs[i_para]
-        else:
-            LW = None
+        hist_kwargs = dict(
+            x=para, bins=bins, cumulative=cumulative,
+            range=XRANGE, density=DENSITY, weights=wg, 
+            color=COLORs[i_para], label=LABEL, 
+            histtype=HISTTYPE, stacked=STACKED,
+            alpha=alpha
+        )
+        if LINE is not None:
+            hist_kwargs['ls'] = LINE
+        if LW is not None:
+            hist_kwargs['lw'] = LW
 
-        if wgs is not None:
-            wg = wgs[i_para]
-        else:
-            wg = None
-
-        if LABELs is not None:
-            LABEL = LABELs[i_para]
-        else:
-            LABEL = None
-
-        if HISTTYPE_list is not None:
-            HISTTYPE = HISTTYPE_list[i_para]
-
-        _, _, handles = plt.hist(x=para, bins=bins, cumulative=cumulative,
-                    range=XRANGE, density=DENSITY, weights=wg, 
-                    color=COLORs[i_para], label=LABEL, 
-                    histtype=HISTTYPE, stacked=STACKED,
-                    ls=LINE, lw=LW, alpha=alpha)
+        _, _, handles = plt.hist(**hist_kwargs)
 
     plt.xlim(XRANGE[0], XRANGE[1])
     if YRANGE is not None:
@@ -401,36 +392,29 @@ def HistPlotFunc_subplots(outpath, N_plots,
                     bins = np.linspace(XRANGE[0], XRANGE[1], nbins)
 
                 for i_val_tmp, para_tmp in enumerate(paras):
+                    LINE = LINEs[i_val_tmp] if LINEs is not None else None
+                    LW = LINEWs[i_val_tmp] if LINEWs is not None else None
+                    wg = wgs[i_val_tmp] if wgs is not None else None
+                    LABEL = LABELs[i_val_tmp] if LABELs is not None else None
+                    HISTTYPE = HISTTYPEs[i_val_tmp] if HISTTYPEs is not None else HISTTYPE
 
-                    if LINEs is not None:
-                        LINE = LINEs[i_val_tmp]
-                    else:
-                        LINE = None
-
-                    if LINEWs is not None:
-                        LW = LINEWs[i_val_tmp]
-                    else:
-                        LW = None
-
-                    if wgs is not None:
-                        wg = wgs[i_val_tmp]
-                    else:
-                        wg = None
-
-                    if LABELs is not None:
-                        LABEL = LABELs[i_val_tmp]
-                    else:
-                        LABEL = None
-
-                    if HISTTYPEs is not None:
-                        HISTTYPE = HISTTYPEs[i_val_tmp]
-
-                    ax.hist(x=para_tmp, 
-                        bins=bins, range=XRANGE, density=DENSITY, 
-                        weights=wg, color=COLORs[i_val_tmp], 
-                        label=LABEL, histtype=HISTTYPE, 
+                    hist_kwargs = dict(
+                        x=para_tmp,
+                        bins=bins,
+                        range=XRANGE,
+                        density=DENSITY,
+                        weights=wg,
+                        color=COLORs[i_val_tmp],
+                        label=LABEL,
+                        histtype=HISTTYPE,
                         stacked=STACKED,
-                        ls=LINE, lw=LW)
+                    )
+                    if LINE is not None:
+                        hist_kwargs['ls'] = LINE
+                    if LW is not None:
+                        hist_kwargs['lw'] = LW
+
+                    ax.hist(**hist_kwargs)
 
                 if (LABEL_position=='inSub') and (i_plot == LABEL_position_SUBid) and (LABELs is not None):
                     ax.legend(frameon=True, loc=loc_legend)
